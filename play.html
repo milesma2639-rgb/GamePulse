@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamePulse · Loading…</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 60px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(233,69,96,0.4);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            z-index: 10;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #ffffff 0%, #e94560 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .game-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .game-category {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
+        .topbar-btn {
+            background: linear-gradient(135deg, #e94560 0%, #c33656 100%);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .topbar-btn:hover {
+            background: linear-gradient(135deg, #ff5577 0%, #d44666 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(233,69,96,0.4);
+        }
+
+        .topbar-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .topbar-btn.secondary:hover {
+            background: rgba(255,255,255,0.18);
+            box-shadow: none;
+        }
+
+        .game-stage {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+        }
+
+        #gameFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 56px;
+            height: 56px;
+            border: 4px solid rgba(233,69,96,0.2);
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .overlay-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .overlay-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 15px;
+            max-width: 480px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .overlay-btns {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .overlay-btn {
+            background: linear-gradient(135deg, #e94560 0%, #c33656 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .overlay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(233,69,96,0.4);
+        }
+
+        .overlay-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 600px) {
+            .topbar { padding: 0 12px; gap: 8px; }
+            .logo { font-size: 18px; }
+            .game-title { font-size: 14px; }
+            .game-category { display: none; }
+            .topbar-btn { padding: 8px 12px; font-size: 13px; }
+            .topbar-btn .btn-label-long { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <a href="index.html" class="logo">GAMEPULSE</a>
+        <div class="divider"></div>
+        <div class="game-title" id="gameTitle">Loading…<span class="game-category" id="gameCategory"></span></div>
+        <button class="topbar-btn secondary" onclick="toggleFullscreen()" title="Fullscreen">
+            <span>⛶</span><span class="btn-label-long">Fullscreen</span>
+        </button>
+        <a href="index.html" class="topbar-btn">
+            <span>←</span><span class="btn-label-long">All Games</span>
+        </a>
+    </div>
+
+    <div class="game-stage" id="gameStage">
+        <div class="overlay" id="loadingOverlay">
+            <div class="loader"></div>
+            <div class="overlay-title">Loading game…</div>
+            <div class="overlay-text" id="loadingText">Starting up the game. This usually takes a few seconds.</div>
+        </div>
+
+        <div class="overlay hidden" id="errorOverlay">
+            <div class="overlay-title">This game can't be embedded</div>
+            <div class="overlay-text">
+                The host blocks games from running on other sites for security reasons.
+                You can still play it — it'll open in a new tab.
+            </div>
+            <div class="overlay-btns">
+                <a id="openExternal" class="overlay-btn" target="_blank" rel="noopener">
+                    <span>▶</span> Open Game
+                </a>
+                <a href="index.html" class="overlay-btn secondary">
+                    <span>←</span> Back to GamePulse
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const gameName = params.get('name') || 'Unknown Game';
+        const gameUrl  = params.get('url');
+        const gameCat  = params.get('cat') || '';
+
+        document.title = `GamePulse · ${gameName}`;
+        document.getElementById('gameTitle').firstChild.textContent = gameName + ' ';
+        if (gameCat) {
+            document.getElementById('gameCategory').textContent = `· ${gameCat}`;
+        }
+
+        const stage = document.getElementById('gameStage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const errorOverlay = document.getElementById('errorOverlay');
+        const openExternal = document.getElementById('openExternal');
+
+        const UGS_PREFIX = 'https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/';
+
+        if (!gameUrl) {
+            showError('No game was specified.');
+        } else {
+            openExternal.href = gameUrl;
+
+            const frame = document.createElement('iframe');
+            frame.id = 'gameFrame';
+            frame.allow = 'fullscreen *; autoplay *; gamepad *; microphone *; camera *; clipboard-write *; encrypted-media *; xr-spatial-tracking *; web-share *';
+            frame.allowFullscreen = true;
+            frame.referrerPolicy = 'no-referrer';
+            stage.appendChild(frame);
+
+            let loaded = false;
+            frame.addEventListener('load', () => {
+                loaded = true;
+                loadingOverlay.classList.add('hidden');
+            });
+
+            if (gameUrl.startsWith(UGS_PREFIX)) {
+                // jsdelivr serves UGS files as text/plain — fetch and inject via srcdoc.
+                fetch(gameUrl)
+                    .then(r => {
+                        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return r.text();
+                    })
+                    .then(html => {
+                        const suppress = '<script>(function(){window.alert=function(m){console.warn("[GamePulse] suppressed alert:",m);};})();<\/script>';
+                        if (/<head[^>]*>/i.test(html)) {
+                            html = html.replace(/<head[^>]*>/i, m => m + suppress);
+                        } else {
+                            html = suppress + html;
+                        }
+                        frame.srcdoc = html;
+                    })
+                    .catch(err => {
+                        showError(`Couldn't load this game: ${err.message}`);
+                    });
+                setTimeout(() => {
+                    if (!loaded) showError("This game is taking too long to load. You can try opening it directly.");
+                }, 15000);
+            } else {
+                frame.src = gameUrl;
+                setTimeout(() => {
+                    if (!loaded) showError();
+                }, 8000);
+            }
+        }
+
+        function showError(customText) {
+            if (customText) {
+                errorOverlay.querySelector('.overlay-text').textContent = customText;
+            }
+            loadingOverlay.classList.add('hidden');
+            errorOverlay.classList.remove('hidden');
+        }
+
+        function toggleFullscreen() {
+            const frame = document.getElementById('gameFrame');
+            const target = frame || stage;
+            if (!document.fullscreenElement) {
+                target.requestFullscreen?.();
+            } else {
+                document.exitFullscreen?.();
+            }
+        }
+    </script>
+</body>
+</html>
