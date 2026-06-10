@@ -489,17 +489,34 @@
 
     <script>
         // ── Firebase ────────────────────────────────────────────────────
-        firebase.initializeApp({
-            apiKey:            "AIzaSyCPJb3DQAAV27yGteEUbkSe4QM7_6JEqvE",
-            authDomain:        "gamepulse-155c8.firebaseapp.com",
-            projectId:         "gamepulse-155c8",
-            storageBucket:     "gamepulse-155c8.firebasestorage.app",
-            messagingSenderId: "785732422861",
-            appId:             "1:785732422861:web:f14e66423ffa382f902d84",
-            databaseURL:       "https://gamepulse-155c8-default-rtdb.firebaseio.com"
-        });
-        const _db = firebase.database();
-        const gpRef = (path) => _db.ref('gamepulse/' + path);
+        const _noopRef = {
+            once:   () => Promise.resolve({ val: () => null, exists: () => false, forEach: () => {} }),
+            set:    () => Promise.resolve(),
+            remove: () => Promise.resolve(),
+            on:     () => {},
+            off:    () => {},
+            push:   () => ({ set: () => Promise.resolve() })
+        };
+        let _db = null;
+        const gpRef = (path) => _db ? _db.ref('gamepulse/' + path) : _noopRef;
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp({
+                        apiKey:            "AIzaSyCPJb3DQAAV27yGteEUbkSe4QM7_6JEqvE",
+                        authDomain:        "gamepulse-155c8.firebaseapp.com",
+                        projectId:         "gamepulse-155c8",
+                        storageBucket:     "gamepulse-155c8.firebasestorage.app",
+                        messagingSenderId: "785732422861",
+                        appId:             "1:785732422861:web:f14e66423ffa382f902d84",
+                        databaseURL:       "https://gamepulse-155c8-default-rtdb.firebaseio.com"
+                    });
+                }
+                _db = firebase.database();
+            }
+        } catch(e) {
+            console.warn('[GamePulse] Firebase init failed — running in offline mode:', e);
+        }
         // ────────────────────────────────────────────────────────────────
 
         const SS_USER = 'gp_user';

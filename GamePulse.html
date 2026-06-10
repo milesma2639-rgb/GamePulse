@@ -3362,18 +3362,37 @@ const games = [
         // ================================================================
         // FIREBASE SETUP
         // ================================================================
-        firebase.initializeApp({
-            apiKey:            "AIzaSyCPJb3DQAAV27yGteEUbkSe4QM7_6JEqvE",
-            authDomain:        "gamepulse-155c8.firebaseapp.com",
-            projectId:         "gamepulse-155c8",
-            storageBucket:     "gamepulse-155c8.firebasestorage.app",
-            messagingSenderId: "785732422861",
-            appId:             "1:785732422861:web:f14e66423ffa382f902d84",
-            databaseURL:       "https://gamepulse-155c8-default-rtdb.firebaseio.com"
-        });
-        const _db = firebase.database();
+        // No-op Firebase reference used when Firebase fails to load (keeps
+        // the portal, login UI, and navigation working in offline mode)
+        const _noopRef = {
+            once:   () => Promise.resolve({ val: () => null, exists: () => false, forEach: () => {} }),
+            set:    () => Promise.resolve(),
+            remove: () => Promise.resolve(),
+            on:     () => {},
+            off:    () => {},
+            push:   () => ({ set: () => Promise.resolve() })
+        };
+        let _db = null;
         // Helper: get a Firebase reference under the gamepulse/ root
-        const gpRef = (path) => _db.ref('gamepulse/' + path);
+        const gpRef = (path) => _db ? _db.ref('gamepulse/' + path) : _noopRef;
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp({
+                        apiKey:            "AIzaSyCPJb3DQAAV27yGteEUbkSe4QM7_6JEqvE",
+                        authDomain:        "gamepulse-155c8.firebaseapp.com",
+                        projectId:         "gamepulse-155c8",
+                        storageBucket:     "gamepulse-155c8.firebasestorage.app",
+                        messagingSenderId: "785732422861",
+                        appId:             "1:785732422861:web:f14e66423ffa382f902d84",
+                        databaseURL:       "https://gamepulse-155c8-default-rtdb.firebaseio.com"
+                    });
+                }
+                _db = firebase.database();
+            }
+        } catch(e) {
+            console.warn('[GamePulse] Firebase init failed — running in offline mode:', e);
+        }
 
         // ================================================================
         // AUTH + ROUTING
